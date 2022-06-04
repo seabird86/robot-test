@@ -21,7 +21,13 @@ def random_enum(*args):
     index = random_int(0, len(args) - 1)
     return args[index]
 
-def unflat_json(body):
+def _unflat_json(j):
+    d = unflat_json(j)
+    json_body=json.dumps(d,separators=(',', ':'))
+    print(json_body)
+    return json_body
+
+def unflat_json(j):
     d = {}
     for key, value in j.items():
         s = d
@@ -37,60 +43,33 @@ def unflat_json(body):
             s = s[index]
     return d
 
-# j = {'a': 1, 'b.0': 5,'b.1': 5}
-# {
-#   "item[0].subitem[0].key": "value1",
-#   "item[0].subitem[1].key": "value2",
-#   "item[1].subitem[0].key": "value3",
-#   "item[1].subitem[1].key": "value4",
-#   "item2[0].subitem[0]": "value5",
-#   "item2[0].subitem[1]": "value6",
-#   "item2[1][0].key1": "value7",
-#   "item2[1][1].key2": "value8"
-# }
-# print(unflat_json(j))
-
-
-def merge_json(json_body,json_template):
+def _merge_json(json_body,json_template):
     print("*** {} *** {}".format(json_body, json_template))
-    template = json.loads(json_template)
     body = json.loads(json_body)
-    body = generate_json(body,template)
-    json_body=json.dumps(body,separators=(',', ':'))
+    json_body = build_json(body,json_template)
     print("{}".format(json_body))
     return json_body
-# If null -> keep null
-# If absent or If conflict type with template -> get template to overwrite with default
-# If is dic -> merge key
-# If is [] and body absent or If conflict type with template-> get template to overwrite with default
-# If template is primitive -> set default if body is primitive or body is not primitive
 
-def generate_json_now(body,json_template):
+def build_body(body,json_template):
+    body=unflat_json(body)
     json_body=json.dumps(body,separators=(',', ':'))
     body = json.loads(json_body)
     template = json.loads(json_template)
     body = generate_json(body,template)
+    return body
+
+def build_json(body,json_template):
+    body = build_body(body,json_template)
     json_body=json.dumps(body,separators=(',', ':'))
-    # print("===={}".format(json_body))
     return json_body
 
 def parse_value(value):
-    print("++{} ".format(value))
     return eval(value.partition(' ')[2])
 
 def _generate_json(template):
     if type(template) is dict:
         for key, child in template.items():
             template[key] = _generate_json(template[key])
-            # if type(template[key]) is dict:
-            #     template[key] = _generate_json(template[key])
-            # elif type(template[key]) is list:
-            #     if len(template[key])==0:
-            #         return template
-            #     if len(template[key])==1:
-            #         template[key]=_generate_json(template[key])
-            # else:
-            #     template[key]=parse_value(template[key])
     elif type(template) is list:
         if len(template)==0:
             return template
@@ -129,9 +108,7 @@ def generate_json(body,template):
                     raise Exception("Incompatible type list")
                 template[key] = generate_json(body[key],template[key])
             else:
-                print("====>")
                 if key not in body:
-                    print("++++>")
                     template[key] = parse_value(template[key])
                     continue
                 elif body[key] is None:
@@ -159,29 +136,43 @@ def generate_json(body,template):
             raise Exception("Incompatible type primitive")
         return body
     return template
+#
+# assert  _merge_json('{}','{"A":"int random_enum(1)"}')=='{"A":1}'
+# assert  _merge_json('{}','{"A":{"AA":"int random_enum(1)"}}')=='{"A":{"AA":1}}'
+# assert  _merge_json('{}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":1}}}'
+# assert  _merge_json('{}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1}]}'
+# assert  _merge_json('{}','{"A":["int random_enum(1)"]}')=='{"A":[1]}'
+# assert  _merge_json('{}','{"A":[{"AA":"int random_enum(1)","AB":"int random_enum(1)"}]}')=='{"A":[{"AA":1,"AB":1}]}'
+# assert  _merge_json('{}','{"A":[{"AA":[{"AAA":"int random_enum(1)"}]}]}')=='{"A":[{"AA":[{"AAA":1}]}]}'
+# assert  _merge_json('{"A":1}','{"A":"int random_enum(1)"}')=='{"A":1}'
+# assert  _merge_json('{"A":2,"B":2}','{"A":"int random_enum(1)"}')=='{"A":2}'
+# assert  _merge_json('{"A":{"AA":{}}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":1}}}'
+# assert  _merge_json('{"A":{"AA":null}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":null}}'
+# assert  _merge_json('{"A":{"AA":{"AAA":2}}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":2}}}'
+# assert  _merge_json('{"A":null}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":null}'
+# assert  _merge_json('{"A":[]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[]}'
+# assert  _merge_json('{"A":[{"AA":2}]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":2}]}'
+# assert  _merge_json('[{},{}]','[{"AA":"int random_enum(1)"}]')=='[{"AA":1},{"AA":1}]'
+# assert  _merge_json('{"A":[{},{}]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1},{"AA":1}]}'
+# assert  _merge_json('[1,2,3]','["int random_enum(1)"]')=='[1,2,3]'
+# assert  _merge_json('[]','["int random_enum(1)"]')=='[]'
+# assert  _merge_json('{}','{"A":["int random_enum(1)"]}')=='{"A":[1]}'
+# assert  _merge_json('{"A":[[{"AA":2}]]}','{"A":[[{"AA":"int random_enum(1)"}]]}')=='{"A":[[{"AA":2}]]}'
+# assert  _merge_json('{"A":[]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[]}'
+# assert  _merge_json('{}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1}]}'
 
 
-# default value & wrong format
-assert  merge_json('{}','{"A":"int random_enum(1)"}')=='{"A":1}'
-assert  merge_json('{}','{"A":{"AA":"int random_enum(1)"}}')=='{"A":{"AA":1}}'
-assert  merge_json('{}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":1}}}'
-assert  merge_json('{}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1}]}'
-assert  merge_json('{}','{"A":["int random_enum(1)"]}')=='{"A":[1]}'
-assert  merge_json('{}','{"A":[{"AA":"int random_enum(1)","AB":"int random_enum(1)"}]}')=='{"A":[{"AA":1,"AB":1}]}'
-assert  merge_json('{}','{"A":[{"AA":[{"AAA":"int random_enum(1)"}]}]}')=='{"A":[{"AA":[{"AAA":1}]}]}'
-assert  merge_json('{"A":1}','{"A":"int random_enum(1)"}')=='{"A":1}'
-assert  merge_json('{"A":2,"B":2}','{"A":"int random_enum(1)"}')=='{"A":2}'
-assert  merge_json('{"A":{"AA":{}}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":1}}}'
-assert  merge_json('{"A":{"AA":null}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":null}}'
-assert  merge_json('{"A":{"AA":{"AAA":2}}}','{"A":{"AA":{"AAA":"int random_enum(1)"}}}')=='{"A":{"AA":{"AAA":2}}}'
-
-assert  merge_json('{"A":null}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":null}'
-assert  merge_json('{"A":[]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[]}'
-assert  merge_json('{"A":[{"AA":2}]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":2}]}'
-# assert  merge_json('{"A":[{},{}]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1},{"AA":1}]}'
-assert  merge_json('[{},{}]','[{"AA":"int random_enum(1)"}]')=='[{"AA":1},{"AA":1}]'
-
-# assert  merge_json('{"A":[[{"AA":2}]]}','{"A":[[{"AA":"int random_enum(1)"}]]}')=='{"A":[{"AA":2}]}'
-
-# assert  merge_json('{"A":[]}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[]}'
-# assert  merge_json('{}','{"A":[{"AA":"int random_enum(1)"}]}')=='{"A":[{"AA":1}]}'
+# assert _unflat_json({"A":1})=='{"A":1}'
+# assert _unflat_json({"A.A":1})=='{"A":{"A":1}}'
+# assert _unflat_json({"A.A.A":1})=='{"A":{"A":{"A":1}}}'
+# assert _unflat_json({"A.A":1,"A.B":2})=='{"A":{"A":1,"B":2}}'
+# assert _unflat_json({"A.A":1,"A.B.C":2})=='{"A":{"A":1,"B":{"C":2}}}'
+# assert _unflat_json({"A.A":1,"B.B.A":2})=='{"A":{"A":1},"B":{"B":{"A":2}}}'
+# assert _unflat_json({"A[0].A":1})=='{"A":[{"A":1}]}'
+# assert _unflat_json({"A[0][0].A":2})=='{"A":[[{"A":2}]]}'
+# assert _unflat_json({"A[0]":2})=='{"A":[2]}'
+# assert _unflat_json({"A[1]":2})=='{"A":[2,2]}'
+# assert _unflat_json({"A[0]":0,"A[1]":1})=='{"A":[0,1]}'
+# assert _unflat_json({"A[0].A":0,"A[1].B":1})=='{"A":[{"A":0},{"B":1}]}'
+# assert _unflat_json({"A[0].A":0,"A[1].B":1})=='{"A":[{"A":0},{"B":1}]}'
+# assert _unflat_json({"A[0].A":0,"A":None})=='{"A":[{"A":0},{"B":1}]}'
