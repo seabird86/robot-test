@@ -22,7 +22,7 @@ Library         REST    http://localhost:8021/customer   ssl_verify=false
        ...   }
    ${body}   build body   ${args}   ${template}
    REST.post   /messages   headers=${headers}   body=${body}   data=${params}
-   [Common] - Verify and Extract   ${o_request}   ${o_response}   ${response_status}
+   [Rest] - Verify and Extract   ${o_request}   ${o_response}   ${response_status}
 
 [Customer][API] - Create customer
     [Arguments]   ${o_request}=None   ${o_response}=None   ${remove_null}=${True}   ${remove_empty}=${True}   ${response_status}=200    &{args}
@@ -38,4 +38,4 @@ Library         REST    http://localhost:8021/customer   ssl_verify=false
        ...    }
    ${body}   build body   ${args}   ${template}
    REST.post   /customers   headers=${headers}   body=${body}
-   [Common] - Verify and Extract   ${o_request}   ${o_response}   ${response_status}
+   [Rest] - Verify and Extract   ${o_request}   ${o_response}   ${response_status}
