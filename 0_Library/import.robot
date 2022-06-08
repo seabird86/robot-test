@@ -8,4 +8,5 @@ Library     DateTime
 Library     String
 #Library     Telnet
 #Library     XML
-Library     REST   ssl_verify=${FALSE}
+Library     REST   ssl_verify=false
+Library     py/json_template.py

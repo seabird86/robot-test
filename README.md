@@ -17,8 +17,7 @@ REST
 * REST.Output, request body
 
 
-[https://pypi.org/search](https://pypi.org/search)
-[https://robocorp.com/docs/languages-and-frameworks/robot-framework/cheat-sheet](https://robocorp.com/docs/languages-and-frameworks/robot-framework/cheat-sheet)
-[http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html)
-
-[https://robotframework.org/robotframework/latest/libraries/BuiltIn.html](https://robotframework.org/robotframework/latest/libraries/BuiltIn.html) Evaluating expressions -> Variables in expressions
+1) [https://pypi.org/search](https://pypi.org/search)
+2) [https://robocorp.com/docs/languages-and-frameworks/robot-framework/cheat-sheet](https://robocorp.com/docs/languages-and-frameworks/robot-framework/cheat-sheet)
+3) [http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html)
+4) [https://robotframework.org/robotframework/latest/libraries/BuiltIn.html](https://robotframework.org/robotframework/latest/libraries/BuiltIn.html) Evaluating expressions -> Variables in expressions

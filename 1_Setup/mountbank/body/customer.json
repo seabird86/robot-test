@@ -1,0 +1,23 @@
+{
+    "name": "Customer service",
+    "port": 1100,
+    "protocol": "http",
+    "requests": [],
+    "stubs": [
+    {
+        "predicates": [
+            {
+                "equals": {
+                    "method": "POST",
+                    "path": "/customers"
+                }
+            }
+        ],
+        "responses": [
+            {
+                "inject": "function(request, state, logger){console.log(request.body); var body = JSON.parse(request.body); if (body != null) { if (typeof state.requests === 'undefined') {  state.requests = {};  } return { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body); }}}"
+            }
+        ]
+    }
+    ]
+}

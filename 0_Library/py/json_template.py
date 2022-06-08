@@ -176,3 +176,4 @@ def generate_json(body,template):
 # assert _unflat_json({"A[0].A":0,"A[1].B":1})=='{"A":[{"A":0},{"B":1}]}'
 # assert _unflat_json({"A[0].A":0,"A[1].B":1})=='{"A":[{"A":0},{"B":1}]}'
 # assert _unflat_json({"A[0].A":0,"A":None})=='{"A":[{"A":0},{"B":1}]}'
+

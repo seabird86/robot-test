@@ -1,13 +1,25 @@
 *** Settings ***
-Library         ../Library/py/json_template.py
-Resource        ../Resources/Apis/import.robot
-Resource        ../Resources/Utilities/import.robot
+Resource        ../2_Resources/import.robot
+
+Suite Setup     Run keywords   Set Suite Variable    ${name}     $example   AND
+                ...   log   ${name}   AND
+                ...   Set Suite Variable    ${name}     value   AND
+                ...   log   ${name}   AND
+                ...   Set Suite Variable    $name       value    AND
+                ...   log   ${name}   AND
+                ...   Set Suite Variable    \${name}    value
 
 *** Variables ***
 ${UPPER_CASES}    ABCDEFGHIJKLMNOPQRSTUVWXYZ
 ${LOWER_CASES}    abcdefghijklmnopqrstuvwxyz
 ${NUMBERS}        0123456789
 ${LETTERS}        ${UPPER_CASES}${LOWER_CASES}
+
+
+
+Set Suite Variable    ${name}     value    # Creates ${example}.
+Set Suite Variable    $name       value    # Creates ${name}.
+Set Suite Variable    \${name}    value    # Creates ${name}.
 
 *** Test Cases ***
 
@@ -17,6 +29,7 @@ TC0001- Create new customer
     [Customer][API] - Create customer message
        ...   o_request=test_customer
        ...   o_response=test_response
+       ...   headers=
        ...   name=custom name
 #       ...   rooms[]=${None}
 #        ...   rooms[]=${list}
@@ -28,7 +41,6 @@ TC0001- Create new customer
 #       ...   messages[]=${list}
 #       ...   messages[0]=value
 #       ...   messages[1]=value2
-
 
     log   ${test_customer}
     log   ${test_response}
