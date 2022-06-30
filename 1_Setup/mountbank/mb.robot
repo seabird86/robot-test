@@ -1,6 +1,7 @@
 *** Settings ***
 Resource        ../../0_Library/import.robot
 Resource        ../../2_Resources/APIs/url.robot
+Resource         ../../2_Resources/Shared/import.robot
 
 *** Keywords ***
 

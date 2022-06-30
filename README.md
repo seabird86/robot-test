@@ -10,6 +10,11 @@ pip3 install -U -r requirements.txt
 python3 -m robot -d results -v env:local -v browser:chrome -e not_ready -t  "*$SelectedText$*" "$FilePath$" $ProjectFileDir$
 ```
 
+```
+python3 -m robot -d results -v env:local -v browser:chrome -e not_ready -t  "*TC9999*" "/Users/admin/Project/GitHub/Microservice/robot-test" .
+```
+
+
 REST
 
 * REST.Output, response data

@@ -5,7 +5,7 @@ Resource        ../2_Resources/import.robot
 
 *** Test Cases ***
 
-TC0002 - [Fail] Create customer with Invalid client
+TC0002 - [Fail] Create customer with valid client
     [tags]   2022
     ${list}   create list
     [Customer][API] - Create customer message
@@ -19,7 +19,7 @@ TC0002 - [Fail] Create customer with Invalid client
         ...   rooms[1].value[]=${list}
     log   ${test_customer}
 
-TC0003 - Create customer with Invalid client
+TC0003 - Create customer with message
     [tags]   2022
     ${list}   create list
     [Rest] - Build header   o_header=test_headers
